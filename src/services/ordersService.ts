@@ -1,4 +1,4 @@
-import { ref, push, onValue, update, remove, type Unsubscribe } from "firebase/database";
+import { ref, push, onValue, update, remove, type Unsubscribe, get } from "firebase/database";
 import { db } from "../firebaseConfig";
 import logger from "./logging";
 import type { CartItem } from "../entities/entities";
@@ -6,8 +6,8 @@ import type { CartItem } from "../entities/entities";
 export type OrderStatus = "CREATED" | "PAID" | "CANCELLED";
 
 export interface Order {
-    id: string;          // Firebase key
-    createdAt: number;   // Date.now()
+    id: string;        // Firebase key
+    createdAt: number; // Date.now()
     status: OrderStatus;
     items: CartItem[];
     total: number;
@@ -16,8 +16,30 @@ export interface Order {
 
 const ORDERS_PATH = "orders";
 
+type OrderDbModel = Omit<Order, "id">;
+
 function computeTotal(items: CartItem[]): number {
     return items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+}
+
+function normalizeOrder(id: string, value: Partial<OrderDbModel> | undefined): Order {
+    const items = Array.isArray(value?.items) ? (value!.items as CartItem[]) : [];
+    const createdAt = typeof value?.createdAt === "number" ? value.createdAt : Date.now();
+    const status = (value?.status ?? "CREATED") as OrderStatus;
+
+    const total =
+        typeof value?.total === "number" && Number.isFinite(value.total)
+            ? value.total
+            : computeTotal(items);
+
+    return {
+        id,
+        createdAt,
+        status,
+        items,
+        total,
+        notes: value?.notes ?? "",
+    };
 }
 
 export type CreateOrderInput = {
@@ -30,7 +52,7 @@ export type CreateOrderInput = {
 async function create(order: CreateOrderInput): Promise<string> {
     const ordersRef = ref(db, ORDERS_PATH);
 
-    const payload = {
+    const payload: OrderDbModel = {
         createdAt: order.createdAt ?? Date.now(),
         status: order.status ?? "CREATED",
         items: order.items ?? [],
@@ -46,25 +68,19 @@ async function create(order: CreateOrderInput): Promise<string> {
     return id;
 }
 
-function subscribe(onOrders: (orders: Order[]) => void, onError?: (e: unknown) => void): Unsubscribe {
+function subscribe(
+    onOrders: (orders: Order[]) => void,
+    onError?: (e: unknown) => void
+): Unsubscribe {
     const ordersRef = ref(db, ORDERS_PATH);
 
     return onValue(
         ordersRef,
         (snapshot) => {
-            const data = snapshot.val() as Record<string, Omit<Order, "id">> | null;
+            const data = snapshot.val() as Record<string, Partial<OrderDbModel>> | null;
 
-            const orders: Order[] = data
-                ? Object.entries(data).map(([id, value]) => ({
-                    id,
-                    createdAt: value.createdAt ?? Date.now(),
-                    status: value.status ?? "CREATED",
-                    items: Array.isArray(value.items) ? (value.items as CartItem[]) : [],
-                    total: Number.isFinite(value.total)
-                        ? value.total
-                        : computeTotal(Array.isArray(value.items) ? (value.items as CartItem[]) : []),
-                    notes: value.notes,
-                }))
+            const orders = data
+                ? Object.entries(data).map(([id, value]) => normalizeOrder(id, value))
                 : [];
 
             onOrders(orders);
@@ -76,7 +92,15 @@ function subscribe(onOrders: (orders: Order[]) => void, onError?: (e: unknown) =
     );
 }
 
-async function patch(id: string, partial: Partial<Omit<Order, "id">>): Promise<void> {
+async function listOnce(): Promise<Order[]> {
+    const ordersRef = ref(db, ORDERS_PATH);
+    const snap = await get(ordersRef);
+    const data = snap.val() as Record<string, Partial<OrderDbModel>> | null;
+
+    return data ? Object.entries(data).map(([id, value]) => normalizeOrder(id, value)) : [];
+}
+
+async function patch(id: string, partial: Partial<OrderDbModel>): Promise<void> {
     const orderRef = ref(db, `${ORDERS_PATH}/${id}`);
     await update(orderRef, partial);
     logger.info(`Order updated: ${id}`);
@@ -96,6 +120,7 @@ const orderService = {
     create,
     createFromCart,
     subscribe,
+    listOnce,   // опционально
     patch,
     deleteById,
 };

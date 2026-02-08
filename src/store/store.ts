@@ -16,7 +16,9 @@ export const store = configureStore({
         food: foodReducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(loggerMiddleware),
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }).concat(loggerMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
