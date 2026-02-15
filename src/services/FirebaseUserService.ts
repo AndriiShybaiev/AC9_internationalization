@@ -1,5 +1,5 @@
 import { getDatabase, ref, set, get, update } from "firebase/database";
-import app from "../firebaseConfig";
+import { app } from "../firebaseConfig";
 import type { IUserService } from "./IUserService";
 
 export class FirebaseUserService implements IUserService {

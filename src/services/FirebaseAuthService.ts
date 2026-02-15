@@ -1,7 +1,7 @@
 import type { IAuthService } from "./IAuthService";
 import { Role } from "./IAuthService";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import app from "../firebaseConfig";
+import { app } from "../firebaseConfig";
 import { FirebaseDatabaseService } from "./FirebaseDatabaseService";
 
 const auth = getAuth(app);

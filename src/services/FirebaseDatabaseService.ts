@@ -1,5 +1,5 @@
 import { getDatabase, ref, get } from "firebase/database";
-import app from "../firebaseConfig";
+import { app } from "../firebaseConfig";
 import { Role } from "./IAuthService";
 import type { IUserDatabaseService } from "./IUserDatabaseService";
 
