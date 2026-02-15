@@ -1,3 +1,4 @@
+// @ts-ignore
 export enum Role {
     ADMIN = "ADMIN",
     USER = "USER",
