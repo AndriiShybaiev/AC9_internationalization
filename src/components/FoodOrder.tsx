@@ -3,7 +3,8 @@ import type {CartItem, MenuItem} from "../entities/entities";
 import {foodAppContext} from "../App.tsx";
 import logger from "../services/logging";
 import orderService from "../services/ordersService";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, FormattedNumber } from "react-intl";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 interface FoodOrderProps {
     food: MenuItem;
@@ -14,6 +15,7 @@ type SaveState = "idle" | "saving" | "saved" | "error";
 
 function FoodOrder(props: FoodOrderProps) {
     const quantityContext = useContext(foodAppContext);
+    const { locale } = useContext(LanguageContext);
     if (!quantityContext) throw new Error("No se ha encontrado el contexto de pedidos");
 
     const [quantity, setQuantity] = useState(1);
@@ -63,7 +65,9 @@ function FoodOrder(props: FoodOrderProps) {
             <h4 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-2">
                 <FormattedMessage id="order.title" />
             </h4>
-            <p className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">{props.food.name}</p>
+            <p className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
+                <FormattedMessage id={`food.${props.food.id}.name`} defaultMessage={props.food.name} />
+            </p>
 
             {!isOrdered ? (
                 <div className="space-y-8">
@@ -85,7 +89,7 @@ function FoodOrder(props: FoodOrderProps) {
                             <FormattedMessage id="order.price" />
                         </span>
                         <span className="text-3xl font-black text-gray-900 dark:text-gray-100">
-                            {totalAmount}$
+                            <FormattedNumber value={totalAmount} style="currency" currency={locale === 'es' ? 'EUR' : 'USD'} minimumFractionDigits={0} />
                         </span>
                     </div>
 

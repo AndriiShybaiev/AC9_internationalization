@@ -42,5 +42,13 @@
   "register.email": "Email",
   "register.password": "Password",
   "register.button": "Register",
-  "register.success": "Registration successful. Redirecting to Dashboard..."
+  "register.success": "Registration successful. Redirecting to Dashboard...",
+  "food.1.name": "Chicken Burger",
+  "food.1.desc": "Fried chicken burger - ... and mayonnaise",
+  "food.2.name": "Beef Burger",
+  "food.2.desc": "Beef burger with cheese and tomato",
+  "food.3.name": "Ice Cream",
+  "food.3.desc": "Ice cream cone",
+  "food.4.name": "French Fries",
+  "food.4.desc": "French fries with green sauce"
 }

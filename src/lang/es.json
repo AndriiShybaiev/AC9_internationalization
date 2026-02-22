@@ -42,5 +42,13 @@
   "register.email": "Correo electrónico",
   "register.password": "Contraseña",
   "register.button": "Registrarse",
-  "register.success": "Registro exitoso. Redirigiendo al Dashboard..."
+  "register.success": "Registro exitoso. Redirigiendo al Dashboard...",
+  "food.1.name": "Hamburguesa de Pollo",
+  "food.1.desc": "Hamburguesa de pollo frito - ... y mayones",
+  "food.2.name": "Hamburguesa de Carne",
+  "food.2.desc": "Hamburguesa de carne con queso y tomate",
+  "food.3.name": "Helado",
+  "food.3.desc": "Cono de helado",
+  "food.4.name": "Patatas fritas",
+  "food.4.desc": "Patatas fritas con salsa verde"
 }

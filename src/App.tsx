@@ -20,7 +20,7 @@ import logger from "./services/logging";
 
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LanguageContext } from "./contexts/LanguageContext";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, FormattedNumber } from "react-intl";
 import authService from "./services/AuthService";
 import { Role } from "./services/IAuthService";
 import userService from "./services/UserService";
@@ -340,6 +340,7 @@ const Register: React.FC = () => {
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useContext(AuthContext);
+  const { locale } = useContext(LanguageContext);
 
   const isChooseFoodPage = useSelector((s: RootState) => s.food.isChooseFoodPage);
   const menuItems = useSelector((s: RootState) => s.food.menuItems);
@@ -426,10 +427,12 @@ const Dashboard: React.FC = () => {
                     {cartItems.map((c) => (
                         <li key={c.id} className="py-4 flex justify-between items-center">
                     <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {c.name} <span className="text-gray-400 dark:text-gray-500 text-sm">x{c.quantity}</span>
+                      <FormattedMessage id={`food.${c.id}.name`} defaultMessage={c.name} /> <span className="text-gray-400 dark:text-gray-500 text-sm">x{c.quantity}</span>
                     </span>
                           <div className="flex items-center space-x-6">
-                              <span className="font-bold text-gray-900 dark:text-gray-100">{c.price * c.quantity}$</span>
+                              <span className="font-bold text-gray-900 dark:text-gray-100">
+                                  <FormattedNumber value={c.price * c.quantity} style="currency" currency={locale === 'es' ? 'EUR' : 'USD'} minimumFractionDigits={0} />
+                              </span>
                               <button
                                   onClick={() => dispatch(removeFromCart({ id: c.id }))}
                                   className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-bold transition-colors p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
@@ -443,7 +446,7 @@ const Dashboard: React.FC = () => {
 
                   <p className="mt-6 text-right text-2xl font-black text-gray-900 dark:text-gray-100">
                       <span className="text-lg font-normal text-gray-500 dark:text-gray-400 mr-2"><FormattedMessage id="dashboard.total" />:</span>
-                      {cartTotal}$
+                      <FormattedNumber value={cartTotal} style="currency" currency={locale === 'es' ? 'EUR' : 'USD'} minimumFractionDigits={0} />
                   </p>
                 </>
             )}
@@ -470,7 +473,9 @@ const Dashboard: React.FC = () => {
                     <span className="text-sm font-mono text-gray-400 dark:text-gray-500 mb-1">#{o.id}</span>
                     <div className="flex items-center space-x-3">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${o.status === 'PAID' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>{o.status}</span>
-                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{o.total}$</span>
+                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                            <FormattedNumber value={o.total} style="currency" currency={locale === 'es' ? 'EUR' : 'USD'} minimumFractionDigits={0} />
+                        </span>
                     </div>
                   </div>
 
@@ -518,7 +523,9 @@ const AdminPanel: React.FC = () => {
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuItems.map((item) => (
                   <li key={item.id} className="bg-gray-50 dark:bg-slate-900 p-5 rounded-2xl flex justify-between items-center border border-gray-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 transition-colors">
-                    <p className="font-bold text-gray-800 dark:text-gray-200">{item.name}</p>
+                    <p className="font-bold text-gray-800 dark:text-gray-200">
+                        <FormattedMessage id={`food.${item.id}.name`} defaultMessage={item.name} />
+                    </p>
                     <p className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-black shadow-md">{item.quantity}</p>
                   </li>
               ))}

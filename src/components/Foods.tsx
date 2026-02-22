@@ -1,5 +1,7 @@
+import { useContext } from "react";
 import type { MenuItem } from "../entities/entities";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, FormattedNumber } from "react-intl";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 interface FoodsProps {
     foodItems: MenuItem[];
@@ -7,6 +9,8 @@ interface FoodsProps {
 }
 
 function Foods(props: FoodsProps) {
+    const { locale } = useContext(LanguageContext);
+
     return (
         <div className="mt-4">
             <h4 className="text-xl font-semibold mb-4 text-gray-700">
@@ -22,12 +26,18 @@ function Foods(props: FoodsProps) {
                                 alt={item.name}
                             />
                             <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
-                                <span className="text-blue-600 dark:text-blue-400 font-bold">{item.price}$</span>
+                                <span className="text-blue-600 dark:text-blue-400 font-bold">
+                                    <FormattedNumber value={item.price} style="currency" currency={locale === 'es' ? 'EUR' : 'USD'} minimumFractionDigits={0} />
+                                </span>
                             </div>
                         </div>
                         <div className="p-5 flex flex-col flex-grow">
-                            <h5 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-2">{item.name}</h5>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 flex-grow leading-relaxed">{item.desc}</p>
+                            <h5 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-2">
+                                <FormattedMessage id={`food.${item.id}.name`} defaultMessage={item.name} />
+                            </h5>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 flex-grow leading-relaxed">
+                                <FormattedMessage id={`food.${item.id}.desc`} defaultMessage={item.desc} />
+                            </p>
                             <div className="mt-auto">
                                 <button
                                     onClick={() => props.onFoodSelected(item)}
