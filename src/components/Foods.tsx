@@ -18,7 +18,7 @@ function Foods(props: FoodsProps) {
                         <div className="h-52 overflow-hidden bg-gray-200 dark:bg-slate-700 relative">
                             <img
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                src={`images/${item.image}`}
+                                src={`${import.meta.env.BASE_URL}images/${item.image}`}
                                 alt={item.name}
                             />
                             <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
