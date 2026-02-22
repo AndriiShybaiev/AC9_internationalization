@@ -170,7 +170,7 @@ const foodSlice = createSlice({
 
             state.statusMessage = `Added to cart: ${food.name} x${quantity}. Cart total=${computeCartTotal(
                 state.cartItems
-            )}$`;
+            )}`;
         },
 
         removeFromCart(state, action: PayloadAction<{ id: number }>) {
